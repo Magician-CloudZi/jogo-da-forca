@@ -46,5 +46,5 @@ Responsavel por:
 - valida letra
 - envia atualização pro cliente
 ## Integrantes
-João Pedro Ximenes
-Artur Melo
+- João Pedro Ximenes
+- Artur Melo
