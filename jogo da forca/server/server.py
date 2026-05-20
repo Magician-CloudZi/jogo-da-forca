@@ -6,5 +6,3 @@ ip = socket.gethostbyname(hostname)
 
 print(f"ip: {ip}")
 print(f"hostname: {hostname}")
-
-print("teste git my")
