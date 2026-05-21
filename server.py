@@ -10,11 +10,19 @@ ADDR = (SEREVER, PORT) #create the pair that represent socket address on local n
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #AF_INET indicates ipv4 and SOCK_STREAM indicates TCP
 server.bind(ADDR) #we define the address of the server socket
 
-def handle_client(conn, addr): #conn -> connection and addr -> address.
-    pass
+def handle_client(conn, addr): #conn -> connection and addr -> address. // handle individual connections
+    print(f'[NEW CONNECTION || ] {addr} connected')
 
-def start():
-    pass
+    connected = True
+    while connected:
+        msg = conn.recv() #storage the package sent by client on "msg". This is a blocking line (program will sleep untill recieve it all)
+
+def start(): #handle new connections
+    server.listen() #server is now open to new connections
+    while True:
+        conn, addr = server.accept() #when a new connection occur, it will store the address and object(socket) that we can use to send files
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread.start()
 
 '''
 hostname = socket.gethostname() -> ask OS the name of current device
