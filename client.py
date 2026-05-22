@@ -3,7 +3,7 @@ import socket
 #defini que vai ser ipv4 e tcp
 client  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #iniciei a conexão com handshake
-client.connect("ip do melo", "mesma porta q ele ta usando")
+client.connect(("127.0.0.1", 5050))
 
 #enviando mensagem
 client.send("ney na copa fds". encode())
