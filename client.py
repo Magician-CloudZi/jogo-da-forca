@@ -1,6 +1,6 @@
 import socket
 
-SERVER = input("[Server IP?:]")
+SERVER = "10.0.100.55" #input("[Server IP?:]")
 PORT = 6969
 FORMAT = "utf-8"
 DISCONNECT_MESSAGE = "!DISCONNECT!" #default message to end connection
@@ -12,7 +12,7 @@ client.connect((SERVER, PORT))
 print(f"Client connected to: {SERVER}:{PORT}")
 
 while True:
-    message = input|("[Write a message:]")
+    message = input("[Write a message:]")
     client.send(message.encode(FORMAT))
     
     if message == DISCONNECT_MESSAGE:
