@@ -1,19 +1,25 @@
 import socket
 
-SERVER = "192.168.0.212"
-PORT = 5050
+SERVER = input("[Server IP?:]")
+PORT = 6969
 FORMAT = "utf-8"
+DISCONNECT_MESSAGE = "!DISCONNECT!" #default message to end connection
 
-#defini que vai ser ipv4 e tcp
+#i define that its gonna be ipv4 and tcp
 client  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#iniciei a conexão com handshake
+#start the connections
 client.connect((SERVER, PORT))
+print(f"Client connected to: {SERVER}:{PORT}")
 
-#enviando mensagem
-mensagem = "ney na copa fds"
-client.send(mensagem.encode(FORMAT))
-#recebendo
-resposta = client.recv(1024).decode(FORMAT)
-print(resposta)
+while True:
+    message = input|("[Write a message:]")
+    client.send(message.encode(FORMAT))
+    
+    if message == DISCONNECT_MESSAGE:
+            print(f"[Disconnected]")
+            break
+    
+    awser = client.recv(1024).decode(FORMAT)
+    print(awser)
 
 client.close()
