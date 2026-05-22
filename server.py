@@ -9,7 +9,7 @@ FORMAT = "utf-8" #std format that we gonna use to translate encode messages
 DISCONNECT_MESSAGE = "!DISCONNECT!" #default message to end connection
 
 #here we finally create the socket that is gonna handle the server connection
-server = socket.socket(socket.AF_INET6, socket.SOCK_STREAM) #AF_INET indicates ipv4 and SOCK_STREAM indicates TCP
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #AF_INET indicates ipv4 and SOCK_STREAM indicates TCP
 server.bind(ADDR) #we define the address of the server socket
 
 def handle_client(conn, addr): #conn -> connection and addr -> address. // handle individual connections
@@ -17,9 +17,8 @@ def handle_client(conn, addr): #conn -> connection and addr -> address. // handl
 
     connected = True
     while connected:
-        data = conn.recv(1024).decode(FORMAT) #storage the package sent by client on "msg". This is a blocking line (program will sleep untill recieve it all)
-        msg = data.decode(FORMAT)
-        if not data or data == DISCONNECT_MESSAGE:
+        msg = conn.recv(1024).decode(FORMAT) #storage the package sent by client on "msg". This is a blocking line (program will sleep untill recieve it all)
+        if not msg or msg == DISCONNECT_MESSAGE:
             connected = False
 
         print(f"[{addr}] sent -> {msg}")
@@ -32,7 +31,7 @@ def handle_client(conn, addr): #conn -> connection and addr -> address. // handl
 def start(): #handle new connections
     server.listen() #server is now open to new connections
     print(f"Server address: {HOST}:{PORT}")
-    
+
     while True:
         conn, addr = server.accept() #when a new connection occur, it will store the address and object(socket) that we can use to send files
         thread = threading.Thread(target=handle_client, args=(conn, addr))
