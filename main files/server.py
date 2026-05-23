@@ -45,19 +45,19 @@ def start(): #handle new connections
 
 #------------------------------------Game Logic----------------------------------------
 
-"""def clean_screen():
+def clean_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def show_painel(conn, hidden_word, attempts):
+def show_painel(conn, hidden_word, lives):
     clean_screen()
     
-    conn.send(f'{attempts} remaining attempts'.encode(FORMAT))
+    conn.send(f'{lives} remaining lives'.encode(FORMAT))
 
-def choose_word(brute_word): #convert the chosen word in traces
+def choose_word(chosen_word): #convert the chosen word in traces
     hidden_word = []
-    brute_word = brute_word.lower()
+    chosen_word = chosen_word.lower()
     
-    for char in brute_word:
+    for char in chosen_word:
         if char == " ":
             hidden_word.append("-")
         else:
@@ -68,21 +68,50 @@ def choose_word(brute_word): #convert the chosen word in traces
 def ask_letter(conn, ):
     chosen_letter = conn.send("Choose a letter: ".encode(FORMAT))
 
-#main loop
+#game loop
 while True:
-    brute_word = input("Qual será a palavra a ser adivinhada?: ")
-    attempts = 6
+    chosen_word = input("Qual será a palavra a ser adivinhada?: ")
+    lives = 6
     right_letters = []
     wrong_letters = []
 
-    hidden_word = choose_word(brute_word) #here we have the word in the stripes format
+    hidden_word = choose_word(chosen_word) #here we have the word in the stripes format
 
-    while attempts >= 0 and hidden_word != list(brute_word):
+    #main logic loop
+    while lives >= 0 and hidden_word != list(chosen_word):
+
+        #make shure that only letter is choosed on each round
         while True:
             chosen_letter = conn.send("Choose a letter: ".encode(FORMAT))
             if len(chosen_letter) == 1:
                 break
-            else:"""
+            else:
+                conn.send("Only one letter at time!!".encode(FORMAT))
+                clean_screen()
 
+        #2nd letter try
+        if chosen_letter in right_letters or chosen_letter in wrong_letters:
+            conn.send("You already try this letter".encode(FORMAT))
 
+        #match cases for the chosen letter
+        elif chosen_letter in chosen_word:
+            right_letters.append(chosen_word)
+            #for each position where this chosen letter appear in the chosen word, save it
+            spots = [pos for pos, letter in enumerate(chosen_word) if letter == chosen_letter]
+            conn.send("Nice try, this letter appear on this word".encode(FORMAT))
+        
+        #letter 1st try and doesnt bellong to chosen_word
+        else:
+            conn.send("this letter doesnt appear in the chosen word".encode(FORMAT))
+            lives -= 1
+            wrong_letters.append(chosen_letter)
+
+    clean_screen()
+
+    if lives == 0:
+        conn.send(f"You lose. The right word is {list(chosen_word)}")
+        break
+    else:
+        conn.send("Congrats, you guess the word")
+        break   
 start()
