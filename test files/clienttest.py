@@ -1,5 +1,6 @@
 import socket
 import os
+from time import sleep
 
 SERVER = "192.168.0.212"
 PORT = 6969
@@ -21,6 +22,7 @@ while True:
         break
 
     client.send(letter.encode(FORMAT))
+    sleep(2)
     clean_screen()
 
 client.close()
