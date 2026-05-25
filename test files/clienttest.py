@@ -23,6 +23,8 @@ while True:
         break
 
     client.send(letter.encode(FORMAT))
+    clean_screen()
+    print("\n\n [processing...]")
     sleep(2)
     clean_screen()
 

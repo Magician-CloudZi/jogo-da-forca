@@ -1,4 +1,4 @@
-import random
+"""import random
 import os
 from time import sleep
 
@@ -113,4 +113,9 @@ while True:
     if jogar_novamente.lower() != 's':
         limpar_tela()
         print('\nObrigado por jogar!\n')
-        break
+        break"""
+
+word = ['a', 'r', 't', 'u', 'r']
+tes = " ".join(word)
+print(f"{word}")
+print(f"\n{tes}")
