@@ -1,3 +1,4 @@
+#server file
 import socket
 import threading
 from time import sleep
@@ -104,7 +105,7 @@ def game_loop(conn): #receives conn from handle_client
                 lives -= 1
                 wrong_letters.append(chosen_letter)
 
-        show_panel()
+            show_panel(conn, hidden_word, lives)    
 
         if lives == 0:
             conn.send(f"\n You lose. The right word is {chosen_word}".encode(FORMAT)) #fixed: added .encode()

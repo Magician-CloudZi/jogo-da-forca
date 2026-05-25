@@ -1,25 +1,29 @@
+#client file
 import socket
+import os
+from time import sleep
 
-SERVER = "192.168.0.212" #input("[Server IP?:]")
+SERVER = "192.168.0.212"
 PORT = 6969
 FORMAT = "utf-8"
-DISCONNECT_MESSAGE = "!DISCONNECT!" #default message to end connection
+DISCONNECT_MESSAGE = "!DISCONNECT!"
 
-#define that its gonna be ipv4 and tcp
-client  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#start the connections
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect((SERVER, PORT))
-print(f"Client connected to: {SERVER}:{PORT}")
+print("hangman game is starting!")
+
+def clean_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 while True:
-    message = input("[Write a message:]")
-    client.send(message.encode(FORMAT))
-    
-    if message == DISCONNECT_MESSAGE:
-            print(f"[Disconnected]")
-            break
-    
-    awser = client.recv(1024).decode(FORMAT)
-    print(awser)
+    server_msg_1 = client.recv(1024).decode(FORMAT)
+    letter = input(f"{server_msg_1}")
+
+    if letter == DISCONNECT_MESSAGE:
+        break
+
+    client.send(letter.encode(FORMAT))
+    sleep(2)
+    clean_screen()
 
 client.close()

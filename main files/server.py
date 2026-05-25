@@ -1,12 +1,13 @@
+#server file
 import socket
 import threading
-import time
+from time import sleep
 import os
 
 #---------------------------Conection Logic---------------------------------------
 
 PORT = 6969 #use high port numbers to avoid conflicts with well-known ports
-HOST = socket.gethostbyname(socket.gethostname()) #ip address of the server. (My address in this case) #im using 0.0.0.0 to listen all networks interfaces that i have
+HOST = socket.gethostbyname(socket.gethostname()) #ip address of the server. (My address in this case)
 ADDR = (HOST, PORT) #create the pair that represent socket address on local network
 FORMAT = "utf-8" #std format that we gonna use to translate encode messages
 DISCONNECT_MESSAGE = "!DISCONNECT!" #default message to end connection
@@ -20,16 +21,7 @@ server.bind(ADDR) #we define the address of the server socket
 def handle_client(conn, addr): #conn -> connection and addr -> address. // handle individual connections
     print(f'[NEW CONNECTION || ] {addr}')
 
-    game_loop(conn) #star the game for that client/connection
-
-    """connected = True
-    while connected:
-        msg = conn.recv(1024).decode(FORMAT) #storage the package sent by client on "msg". This is a blocking line (program will sleep untill recieve it all)
-        if not msg or msg == DISCONNECT_MESSAGE:
-            connected = False
-
-        print(f"[{addr}] sent -> [{msg}]")
-        conn.send("[Server recivied the message]".encode(FORMAT))"""
+    game_loop(conn) #start the game with this client
 
     conn.close()
     print(f"[Disconnected] {addr}")
@@ -50,11 +42,11 @@ def start(): #handle new connections
 def clean_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def show_painel(conn, hidden_word, lives):
-    clean_screen()
-    conn.send(f'{lives} remaining lives'.encode(FORMAT))
+def show_panel(conn, hidden_word, lives):
+    conn.send(f'\n {lives} remaining lives \n {hidden_word} \n'.encode(FORMAT))
+    #clean_screen()
 
-def choose_word(chosen_word): #convert the chosen word in traces
+def encrypt_word(chosen_word): #convert the chosen word in traces
     hidden_word = []
     chosen_word = chosen_word.lower()
     
@@ -66,59 +58,69 @@ def choose_word(chosen_word): #convert the chosen word in traces
 
     return hidden_word #return as list so we can update it later
 
-def ask_letter(conn, ):
-    conn.send("Choose a letter: ".encode(FORMAT))
+def ask_letter(conn):
+    conn.send("\n Choose a letter: ".encode(FORMAT))
+    #clean_screen()
     chosen_letter = conn.recv(1024).decode(FORMAT) #wait for client response
     return chosen_letter
 
-#game loop
-def game_loop(conn):
+def game_loop(conn): #receives conn from handle_client
+    #game loop
     while True:
-        chosen_word = input("Qual será a palavra a ser adivinhada?: ")
+        chosen_word = input("\n What will be the word to guess?: ") #server host types the word
         lives = 6
         right_letters = []
         wrong_letters = []
 
-        hidden_word = choose_word(chosen_word) #here we have the word in the stripes format
+        hidden_word = encrypt_word(chosen_word) #here we have the word in the list format with underscores
 
         #main logic loop
         while lives > 0 and hidden_word != list(chosen_word.lower()):
 
-            #make shure that only letter is choosed on each round
+            #make sure that only one letter is chosen on each round
             while True:
-                chosen_letter = ask_letter(conn)
+                chosen_letter = ask_letter(conn) #send question and receive letter from client
                 if len(chosen_letter) == 1:
                     break
                 else:
-                    conn.send("Only one letter at time!!".encode(FORMAT))
-                    clean_screen()
+                    conn.send("\n Only one letter at a time!!".encode(FORMAT))
+                    #clean_screen()
 
             #2nd letter try
             if chosen_letter in right_letters or chosen_letter in wrong_letters:
-                conn.send("You already try this letter".encode(FORMAT))
+                conn.send("\n You already tried this letter".encode(FORMAT))
 
             #match cases for the chosen letter
-            elif chosen_letter in chosen_word:
-                right_letters.append(chosen_letter)
-                #for each position where this chosen letter appear in the chosen word, save it
-                spots = [pos for pos, letter in enumerate(chosen_word) if letter == chosen_letter]
+            elif chosen_letter in chosen_word.lower():
+                right_letters.append(chosen_letter) #fixed: was appending chosen_word instead of chosen_letter
+                #for each position where this chosen letter appears in the chosen word, update hidden_word
+                spots = [pos for pos, letter in enumerate(chosen_word.lower()) if letter == chosen_letter]
                 for pos in spots:
-                    hidden_word[pos] = chosen_letter #reveal the letter in uts correct positions
-                conn.send("Nice try, this letter appear on this word".encode(FORMAT))
+                    hidden_word[pos] = chosen_letter #reveal the letter in its correct positions
+                conn.send("\n Nice try, this letter appears in this word".encode(FORMAT))
             
-            #letter 1st try and doesnt bellong to chosen_word
+            #letter 1st try and doesnt belong to chosen_word
             else:
-                conn.send("this letter doesnt appear in the chosen word".encode(FORMAT))
+                conn.send("\n This letter doesn't appear in the chosen word".encode(FORMAT))
                 lives -= 1
                 wrong_letters.append(chosen_letter)
 
-        clean_screen()
+            show_panel(conn, hidden_word, lives)    
 
         if lives == 0:
-            conn.send(f"You lose. The right word is {list(chosen_word)}".encode(FORMAT))
-            break
+            conn.send(f"\n You lose. The right word is {chosen_word}".encode(FORMAT)) #fixed: added .encode()
+            #clean_screen()
         else:
-            conn.send("Congrats, you guess the word".encode(FORMAT))
+            conn.send("\n Congrats, you guessed the word!".encode(FORMAT)) #fixed: added .encode()
+            #clean_screen()
+
+        conn.send("\n Wanna play again? [yes/no]".encode(FORMAT))
+        #clean_screen()
+        play_again = conn.recv(1024).decode(FORMAT)
+
+        if play_again == "no":
+            conn.send("\n thanks for playing!".encode(FORMAT))
+            #clean_screen()
             break
 
 start()
