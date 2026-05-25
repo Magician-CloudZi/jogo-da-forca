@@ -12,7 +12,7 @@ PORT = 6969 #use high port numbers to avoid conflicts with well-known ports
 HOST = socket.gethostbyname(socket.gethostname()) #ip address of the server. (My address in this case)
 ADDR = (HOST, PORT) #create the pair that represent socket address on local network
 FORMAT = "utf-8" #std format that we gonna use to translate encode messages
-DISCONNECT_MESSAGE = "!DISCONNECT!" #default message to end connection
+DISCONNECT_MESSAGE = "!D!" #default message to end connection
 
 
 #here we finally create the socket that is gonna handle the server connection
@@ -74,7 +74,7 @@ def ask_letter(conn):
 def game_loop(conn): #receives conn from handle_client
     #game loop
     while True:
-        chosen_word = input("\n\n What will be the word to guess?: ".strip()) #server host types the word
+        chosen_word = input("\n\n What will be the word to guess?: ").strip() #server host types the word
         lives = 6
         right_letters = []
         wrong_letters = []

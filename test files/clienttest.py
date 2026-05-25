@@ -6,7 +6,7 @@ from time import sleep
 SERVER = "192.168.0.212"
 PORT = 6969
 FORMAT = "utf-8"
-DISCONNECT_MESSAGE = "!DISCONNECT!"
+DISCONNECT_MESSAGE = "!D!"
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect((SERVER, PORT))
@@ -20,6 +20,8 @@ while True:
     letter = input(f"{server_msg_1}")
 
     if letter == DISCONNECT_MESSAGE:
+        print("[disconnecting...]")
+        sleep(2)
         break
 
     client.send(letter.encode(FORMAT))
