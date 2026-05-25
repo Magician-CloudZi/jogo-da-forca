@@ -42,10 +42,10 @@ def clean_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def show_panel(conn, hidden_word, lives):
-    clean_screen()
     conn.send(f'{lives} remaining lives'.encode(FORMAT))
+    clean_screen()
 
-def choose_word(chosen_word): #convert the chosen word in traces
+def encrypt_word(chosen_word): #convert the chosen word in traces
     hidden_word = []
     chosen_word = chosen_word.lower()
     
@@ -59,6 +59,7 @@ def choose_word(chosen_word): #convert the chosen word in traces
 
 def ask_letter(conn):
     conn.send("Choose a letter: ".encode(FORMAT))
+    clean_screen()
     chosen_letter = conn.recv(1024).decode(FORMAT) #wait for client response
     return chosen_letter
 
@@ -70,7 +71,7 @@ def game_loop(conn): #receives conn from handle_client
         right_letters = []
         wrong_letters = []
 
-        hidden_word = choose_word(chosen_word) #here we have the word in the list format with underscores
+        hidden_word = encrypt_word(chosen_word) #here we have the word in the list format with underscores
 
         #main logic loop
         while lives > 0 and hidden_word != list(chosen_word.lower()):
@@ -87,6 +88,7 @@ def game_loop(conn): #receives conn from handle_client
             #2nd letter try
             if chosen_letter in right_letters or chosen_letter in wrong_letters:
                 conn.send("You already tried this letter".encode(FORMAT))
+                clean_screen()
 
             #match cases for the chosen letter
             elif chosen_letter in chosen_word.lower():
@@ -96,10 +98,12 @@ def game_loop(conn): #receives conn from handle_client
                 for pos in spots:
                     hidden_word[pos] = chosen_letter #reveal the letter in its correct positions
                 conn.send("Nice try, this letter appears in this word".encode(FORMAT))
+                clean_screen()
             
             #letter 1st try and doesnt belong to chosen_word
             else:
                 conn.send("This letter doesn't appear in the chosen word".encode(FORMAT))
+                clean_screen()
                 lives -= 1
                 wrong_letters.append(chosen_letter)
 
@@ -107,9 +111,18 @@ def game_loop(conn): #receives conn from handle_client
 
         if lives == 0:
             conn.send(f"You lose. The right word is {chosen_word}".encode(FORMAT)) #fixed: added .encode()
-            break
+            clean_screen()
         else:
             conn.send("Congrats, you guessed the word!".encode(FORMAT)) #fixed: added .encode()
-            break   
+            clean_screen()
+
+        conn.send("Wanna play again? [yes/no]".encode(FORMAT))
+        clean_screen()
+        play_again = conn.recv(1024).decode(FORMAT)
+
+        if play_again == "no":
+            conn.send("thanks for playing!".encode(FORMAT))
+            clean_screen()
+            break
 
 start()
